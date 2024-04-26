@@ -4,33 +4,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; overflow: scroll; }
-        .menu {
-            position: relative;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 50px;
-            display: flex;  
-        }
-        .menu > div {
-            padding: 15px;
-        }
-        #chart {
-            position: relative;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-        }
-        label {
-            font-weight: bold;
-        }
+        .menu { position: relative; width: 100%; display: flex; }
+        .menu > div { padding: 15px; }
+        #chart { position: relative; width: 100%; height: 100vh; }
+        label { font-weight: bold; }
     </style>
 </head>
 <body>
     <div class="menu">
         <div>
             <label for="institut">Institut</label>
-            <select id="institut" onchange="filterByInstitut(this)">
+            <select id="institut" onchange="updateChart()">
                 <option value="alle">Alle</option>
                 <option value="Forsa">Forsa</option>
                 <option value="INSA">INSA</option>
@@ -45,39 +29,40 @@
         <div>
             <label>
                 Von:
-                <input type="date" name="start" id="start" onchange="setDate(this)"/>
+                <input type="date" name="start" id="start" onchange="updateChart()"/>
             </label>
         </div>
         <div>
             <label>
                 Bis:
-                <input type="date" name="end" id="end" onchange="setDate(this)"/>
+                <input type="date" name="end" id="end" onchange="updateChart()"/>
             </label>
         </div>
     </div>
     <canvas id="chart"></canvas>
     <script>
+        const inputEnddate = document.getElementById('end')
+        const inputStartdate = document.getElementById('start')
+        const inputInstitut = document.getElementById('institut')
         const params = new URLSearchParams(location.search)
+
         let allJson
 
         function updateURL() {
-            const select = document.getElementById('institut')
-            const institut = select.options[select.options.selectedIndex].value
-            const startDate = document.getElementById('start')
-            const endDate = document.getElementById('end')
+            const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
 
-            if (start === '' && params.has('start')) {
+            if (inputStartdate.value === '' && params.has('start')) {
                 params.delete('start')
             } 
-            if (start !== '') {
-                params.set('start', startDate.value)
+            if (inputStartdate.value !== '') {
+                params.set('start', inputStartdate.value)
             }
 
-            if (end === '' && params.has('end')) {
+            if (inputEnddate.value === '' && params.has('end')) {
                 params.delete('end')
             } 
-            if (end !== '') {
-                params.set('end', endDate.value)
+            if (inputEnddate.value !== '') {
+                params.set('end', inputEnddate.value)
             }
 
             if (institut === 'alle' && params.has('institut')) {
@@ -90,27 +75,18 @@
             history.replaceState(null, null, '?' + params.toString())
         }
 
-        function filterByInstitut(option) {
-            console.log(option.value)
-            const startDate = document.getElementById('start')
-            const endDate = document.getElementById('end')
+        function updateChart() {
+            const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
+            renderChart(prepareData(
+                allJson, 
+                institut === 'alle' ? [] : [institut], 
+                inputStartdate.value, 
+                inputEnddate.value
+            ))
             updateURL()
-            renderChart(prepareData(allJson, option.value === 'alle' ? [] : [option.value], startDate.value, endDate.value))
-        }
-
-        function setDate(date) {
-            console.dir(date.value)
-            const select = document.getElementById('institut')
-            const institut = select.options[select.options.selectedIndex].value
-            const startDate = document.getElementById('start')
-            const endDate = document.getElementById('end')
-            updateURL()
-            renderChart(prepareData(allJson, institut === 'alle' ? [] : [institut], startDate.value, endDate.value))
         }
 
         const prepareData = (json, filterInstituts = [], start = '', end = '') => {
-            console.dir(json);
-            console.log(filterInstituts, start, end);
             const tension = 0
             const data = {
                 labels: [],
@@ -183,20 +159,7 @@
             })
         }
 
-        const getHTMLDocument = async (url) => {
-            const res = await fetch(url)
-            if (!res.ok) {
-                const message = `An error has occured: ${response.status}`
-                throw new Error(message)
-            }
-            const parser = new DOMParser()
-            return parser.parseFromString(res.text(), 'text/html')
-        }
-
         (async () => {
-            // const forsa = await getHTMLDocument('https://www.wahlrecht.de/umfragen/forsa.htm')
-            // console.log(forsa)
-
             fetch('./data.json')
             .then((response) => response.json())
             .then((json) => {
@@ -207,13 +170,13 @@
                 const institut = params.has('institut') ? [params.get('institut')] : []
 
                 if (end !== '') {
-                    document.getElementById('end').value = end
+                    inputEnddate.value = end
                 }
                 if (start !== '') {
-                    document.getElementById('start').value = start
+                    inputStartdate.value = start
                 }
                 if (institut.length) {
-                    document.getElementById('institut').value = params.get('institut')
+                    inputInstitut.value = params.get('institut')
                 }
 
                 renderChart(prepareData(json, institut, start, end))
