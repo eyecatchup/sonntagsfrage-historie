@@ -1,6 +1,6 @@
 <!doctype html>
 <head>
-    <title>Historische Charts zur Sonntagsfrage</title>
+    <title>Verlauf Projektionen Sonntagsfrage Bundestagswahl (alle Institute)</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <style>
         body, html { margin: 0; padding: 0; overflow: scroll; }
@@ -37,6 +37,11 @@
                 Bis:
                 <input type="date" name="end" id="end" onchange="updateChart()"/>
             </label>
+        </div>
+        <div>
+            <a id="download" download="chart.jpg" href="#" title="Aktuelles Chart speichern">
+                Grafik speichern
+            </a>
         </div>
     </div>
     <canvas id="chart"></canvas>
@@ -149,13 +154,56 @@
         }
 
         const renderChart = (data) => {
+            const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
+            let chartTitle = `Verlauf Projektionen Sonntagsfrage Bundestagswahl (${institut === 'alle' ? 'Alle Institute' : institut}`
+            if (inputStartdate.value === '' && inputEnddate.value === '') {
+                chartTitle += ')'
+            } else {
+                if (inputStartdate.value !== '' && inputEnddate.value === '') {
+                    const dt = new Date(inputStartdate.value)
+                    chartTitle += `, seit ${dt.toLocaleDateString()})`
+                } else if (inputStartdate.value === '' && inputEnddate.value !== '') {
+                    const dt = new Date(inputEnddate.value)
+                    chartTitle += `, bis ${dt.toLocaleDateString()})`
+                } else if (inputStartdate.value !== '' && inputEnddate.value !== '') {
+                    const dtStart = new Date(inputStartdate.value)
+                    const dtEnd = new Date(inputEnddate.value)
+                    chartTitle += `, zwischen ${dtStart.toLocaleDateString()} und ${dtEnd.toLocaleDateString()})`
+                }
+            }
+
             document.getElementById('chart').remove()
             let canvas = document.createElement('canvas')
             canvas.id = 'chart'
             document.body.appendChild(canvas)
+
+            const bgPlugin = {
+                id: 'customCanvasBackgroundColor',
+                beforeDraw: (chart, args, options) => {
+                    const {ctx} = chart;
+                    ctx.save();
+                    ctx.globalCompositeOperation = 'destination-over';
+                    ctx.fillStyle = options.color || '#99ffff';
+                    ctx.fillRect(0, 0, chart.width, chart.height);
+                    ctx.restore();
+                }
+            }
+
             new Chart(document.getElementById('chart'), {
                 type: 'line',
-                data: data
+                data: data,
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: chartTitle
+                        },
+                        customCanvasBackgroundColor: {
+                            color: '#fff'
+                        }
+                    }
+                },
+                plugins: [bgPlugin]
             })
         }
 
@@ -180,6 +228,10 @@
                 }
 
                 renderChart(prepareData(json, institut, start, end))
+            })
+
+            document.getElementById('download').addEventListener('click', function() {
+                document.getElementById('download').href = document.getElementById('chart').toDataURL('image/jpg')
             })
         })()
     </script>
