@@ -51,7 +51,7 @@
         const inputInstitut = document.getElementById('institut')
         const params = new URLSearchParams(location.search)
 
-        let allJson
+        let jsonData
 
         function updateURL() {
             const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
@@ -80,18 +80,12 @@
             history.replaceState(null, null, '?' + params.toString())
         }
 
-        function updateChart() {
-            const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
-            renderChart(prepareData(
-                allJson, 
-                institut === 'alle' ? [] : [institut], 
-                inputStartdate.value, 
-                inputEnddate.value
-            ))
+        function updateChart() {  
+            renderChart()
             updateURL()
         }
 
-        const prepareData = (json, filterInstituts = [], start = '', end = '') => {
+        const prepareData = () => {
             const tension = 0
             const data = {
                 labels: [],
@@ -108,52 +102,53 @@
                 ]
             }
 
-            for (let i = 0; i < json.length; i++) {
+            for (let i = 0; i < jsonData.length; i++) {
                 // 1. if date is already set, skip
-                let conditionsPass = !data.labels.includes(json[i].vDatum)
+                let conditionsPass = !data.labels.includes(jsonData[i].vDatum)
                 if (!conditionsPass) {
                     continue
                 }
 
                 // 2. if daterange filter is set, skip if not in daterange
-                const date = new Date(json[i].vDatum)
-                if (start !== '') {
-                    conditionsPass = new Date(start) < date
+                const date = new Date(jsonData[i].vDatum)
+                if (inputStartdate.value !== '') {
+                    conditionsPass = new Date(inputStartdate.value) < date
                 }
                 if (!conditionsPass) {
                     continue
                 }
-                if (end !== '') {
-                    conditionsPass = date < new Date(end)
+                if (inputEnddate.value !== '') {
+                    conditionsPass = date < new Date(inputEnddate.value)
                 }
                 if (!conditionsPass) {
                     continue
                 }
 
                 // 3. if institut filter is set, skip if institut is not selected
-                if (filterInstituts.length) {
-                    conditionsPass = filterInstituts.includes(json[i].institut)
+                const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
+                if (institut !== 'alle') {
+                    conditionsPass = institut === jsonData[i].institut
                 }
                 if (!conditionsPass) {
                     continue
                 }
 
-                data.labels.push(json[i].vDatum.split('T')[0])
-                data.datasets[0].data.push(json[i].cducsu)
-                data.datasets[1].data.push(json[i].spd)
-                data.datasets[2].data.push(json[i].grne)
-                data.datasets[3].data.push(json[i].fdp)
-                data.datasets[4].data.push(json[i].linke)
-                data.datasets[5].data.push(json[i].afd)
-                data.datasets[6].data.push(json[i].fw)
-                data.datasets[7].data.push(json[i].bsw)
-                data.datasets[8].data.push(json[i].sonstige)
+                data.labels.push(jsonData[i].vDatum.split('T')[0])
+                data.datasets[0].data.push(jsonData[i].cducsu)
+                data.datasets[1].data.push(jsonData[i].spd)
+                data.datasets[2].data.push(jsonData[i].grne)
+                data.datasets[3].data.push(jsonData[i].fdp)
+                data.datasets[4].data.push(jsonData[i].linke)
+                data.datasets[5].data.push(jsonData[i].afd)
+                data.datasets[6].data.push(jsonData[i].fw)
+                data.datasets[7].data.push(jsonData[i].bsw)
+                data.datasets[8].data.push(jsonData[i].sonstige)
             }
 
             return data
         }
 
-        const renderChart = (data) => {
+        const renderChart = () => {
             const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
             let chartTitle = `Verlauf Projektionen Sonntagsfrage Bundestagswahl (${institut === 'alle' ? 'Alle Institute' : institut}`
             if (inputStartdate.value === '' && inputEnddate.value === '') {
@@ -191,7 +186,7 @@
 
             new Chart(document.getElementById('chart'), {
                 type: 'line',
-                data: data,
+                data: prepareData(),
                 options: {
                     plugins: {
                         title: {
@@ -208,26 +203,15 @@
         }
 
         (async () => {
+            params.has('end') && (inputEnddate.value = params.get('end'))
+            params.has('start') && (inputStartdate.value = params.get('start'))
+            params.has('institut') && (inputInstitut.value = params.get('institut'))
+
             fetch('./data.json')
             .then((response) => response.json())
             .then((json) => {
-                allJson = json
-
-                const end = params.has('end') ? params.get('end') : ''
-                const start = params.has('start') ? params.get('start') : ''
-                const institut = params.has('institut') ? [params.get('institut')] : []
-
-                if (end !== '') {
-                    inputEnddate.value = end
-                }
-                if (start !== '') {
-                    inputStartdate.value = start
-                }
-                if (institut.length) {
-                    inputInstitut.value = params.get('institut')
-                }
-
-                renderChart(prepareData(json, institut, start, end))
+                jsonData = json
+                renderChart()
             })
 
             document.getElementById('download').addEventListener('click', function() {
