@@ -29214,5 +29214,35 @@
         "bsw": 5,
         "sonstige": 15,
         "nichtwUnentschl": 25
+    },
+    {
+        "institut": "Forschungsg. Wahlen",
+        "befragte": 1000,
+        "vDatum": "2024-04-26T07:00:00.000Z",
+        "cducsu": 30,
+        "spd": 15,
+        "grne": 15,
+        "fdp": 4,
+        "linke": 4,
+        "afd": 17,
+        "fw": 0,
+        "bsw": 5,
+        "sonstige": 10,
+        "nichtwUnentschl": 0
+    },
+    {
+        "institut": "Allensbach",
+        "befragte": 1041,
+        "vDatum": "2024-04-26T07:00:00.000Z",
+        "cducsu": 32.5,
+        "spd": 16,
+        "grne": 15,
+        "fdp": 6,
+        "linke": 3,
+        "afd": 16,
+        "fw": 0,
+        "bsw": 7,
+        "sonstige": 4.5,
+        "nichtwUnentschl": 0
     }
 ]
