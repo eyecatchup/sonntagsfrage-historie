@@ -1,0 +1,158 @@
+<!doctype html>
+<head>
+    <title>Historische Charts zur Sonntagsfrage</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; overflow: scroll; }
+        .menu {
+            position: relative;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            display: flex;  
+        }
+        #chart {
+            position: relative;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+        }
+        .easepick-wrapper {
+            z-index: 9;
+        }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <div>
+            <label for="institut">Institut</label>
+            <select id="institut" onchange="filterByInstitut(this)">
+                <option value="alle">Alle</option>
+                <option value="Forsa">Forsa</option>
+                <option value="INSA">INSA</option>
+                <option value="dimap">dimap</option>
+                <option value="Emnid">Emnid</option>
+                <option value="Forschungsg. Wahlen">Forschungsgruppe Wahlen</option>
+                <option value="Allensbach">Allensbach</option>
+                <option value="YouGov">YouGov</option>
+                <option value="GMS">GMS</option>
+            </select>
+        </div>
+        <div>
+            <label>
+                Von:
+                <input type="date" name="start" id="start" onchange="setDate(this)"/>
+            </label>
+        </div>
+        <div>
+            <label>
+                Bis:
+                <input type="date" name="end" id="end" onchange="setDate(this)"/>
+            </label>
+        </div>
+    </div>
+    <canvas id="chart"></canvas>
+    <script>
+        let allJson
+
+        function filterByInstitut(option) {
+            console.log(option.value)
+            const startDate = document.getElementById('start')
+            const endDate = document.getElementById('end')
+            renderChart(prepareData(allJson, option.value === 'alle' ? [] : [option.value], startDate.value, endDate.value))
+        }
+
+        function setDate(date) {
+            console.dir(date.value)
+            const select = document.getElementById('institut')
+            const institut = select.options[select.options.selectedIndex].value
+            const startDate = document.getElementById('start')
+            const endDate = document.getElementById('end')
+            renderChart(prepareData(allJson, institut === 'alle' ? [] : [institut], startDate.value, endDate.value))
+        }
+
+        const prepareData = (json, filterInstituts = [], start = '', end = '') => {
+            console.dir(json);
+            console.log(filterInstituts, start, end);
+            const data = {
+                labels: [],
+                datasets: [
+                    { label: "CDU/CSU", data: [], borderColor: 'black', tension: 0 },
+                    { label: "SPD", data: [], borderColor: 'red', tension: 0 },
+                    { label: "Grüne", data: [], borderColor: 'green', tension: 0 },
+                    { label: "FDP", data: [], borderColor: 'yellow', tension: 0 },
+                    { label: "Linke", data: [], borderColor: 'darkred', tension: 0 },
+                    { label: "AfD", data: [], borderColor: 'blue', tension: 0 },
+                    { label: "FW", data: [], borderColor: 'lightblue', tension: 0 },
+                    { label: "BSW", data: [], borderColor: 'pink', tension: 0 },
+                    { label: "Sonstige", data: [], borderColor: 'rgba(0, 0, 0, 0.1)', tension: 0 }      
+                ]
+            }
+
+            for (let i = 0; i < json.length; i++) {
+                // 1. if date is already set, skip
+                let conditionsPass = !data.labels.includes(json[i].vDatum)
+                if (!conditionsPass) {
+                    continue
+                }
+
+                // 2. if daterange filter is set, skip if not in daterange
+                const date = new Date(json[i].vDatum)
+                if (start !== '') {
+                    conditionsPass = new Date(start) < date
+                }
+                if (!conditionsPass) {
+                    continue
+                }
+                if (end !== '') {
+                    conditionsPass = date < new Date(end)
+                }
+                if (!conditionsPass) {
+                    continue
+                }
+
+                // 3. if institut filter is set, skip if institut is not selected
+                if (filterInstituts.length) {
+                    conditionsPass = filterInstituts.includes(json[i].institut)
+                }
+                if (!conditionsPass) {
+                    continue
+                }
+
+                data.labels.push(json[i].vDatum)
+                data.datasets[0].data.push(json[i].cducsu)
+                data.datasets[1].data.push(json[i].spd)
+                data.datasets[2].data.push(json[i].grne)
+                data.datasets[3].data.push(json[i].fdp)
+                data.datasets[4].data.push(json[i].linke)
+                data.datasets[5].data.push(json[i].afd)
+                data.datasets[6].data.push(json[i].fw)
+                data.datasets[7].data.push(json[i].bsw)
+                data.datasets[8].data.push(json[i].sonstige)
+            }
+
+            return data
+        }
+
+        const renderChart = (data) => {
+            document.getElementById('chart').remove()
+            let canvas = document.createElement('canvas')
+            canvas.id = 'chart'
+            document.body.appendChild(canvas)
+            new Chart(document.getElementById('chart'), {
+                type: 'line',
+                data: data
+            })
+        }
+
+        (() => {
+            fetch('./data.json')
+            .then((response) => response.json())
+            .then((json) => {
+                allJson = json
+                renderChart(prepareData(json))
+            })
+        })()
+    </script>
+</body>
