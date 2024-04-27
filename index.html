@@ -4,6 +4,7 @@
     <title>Verlauf Projektionen Sonntagsfrage Bundestagswahl (alle Institute)</title>
     <meta charset="utf-8">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0 "></script>
     <style>
         body, html { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
         .menu { position: relative; width: 100%; display: flex; }
@@ -41,6 +42,10 @@
             </label>
         </div>
         <div>
+            <input type="checkbox" id="datalabels" name="datalabels" onchange="updateChart()">
+            <label for="datalabels"> Labels anzeigen</label>
+        </div>
+        <div>
             <a id="download" download="chart.jpg" href="#" title="Aktuelles Chart speichern">
                 Chart als Grafik speichern
             </a>
@@ -52,6 +57,7 @@
         const inputEnddate = document.getElementById('end')
         const inputStartdate = document.getElementById('start')
         const inputInstitut = document.getElementById('institut')
+        const inputLabels = document.getElementById('datalabels')
         const params = new URLSearchParams(location.search)
 
         let jsonData
@@ -78,15 +84,15 @@
             const data = {
                 labels: [],
                 datasets: [
-                    { label: "CDU/CSU", data: [], borderColor: 'black', backgroundColor: 'black', tension: tension },
-                    { label: "SPD", data: [], borderColor: '#E30613', backgroundColor: '#E30613', tension: tension },
-                    { label: "Grüne", data: [], borderColor: '#409A3C', backgroundColor: '#409A3C', tension: tension },
-                    { label: "FDP", data: [], borderColor: '#FFED00', backgroundColor: '#FFED00', tension: tension },
-                    { label: "Linke", data: [], borderColor: '#BE3075', backgroundColor: '#BE3075', tension: tension },
-                    { label: "AfD", data: [], borderColor: '#009EE0', backgroundColor: '#009EE0', tension: tension },
-                    { label: "FW", data: [], borderColor: '#F7A800', backgroundColor: '#F7A800', tension: tension },
-                    { label: "BSW", data: [], borderColor: '#7D254F', backgroundColor: '#7D254F', tension: tension },
-                    { label: "Sonstige", data: [], borderColor: 'rgba(0, 0, 0, 0.1)', backgroundColor: 'rgba(0, 0, 0, 0.1)', tension: tension }      
+                    { label: "CDU/CSU", data: [], borderColor: 'black', backgroundColor: 'black', tension: tension, datalabels: { color: '#000' } },
+                    { label: "SPD", data: [], borderColor: '#E30613', backgroundColor: '#E30613', tension: tension, datalabels: { color: '#E30613' } },
+                    { label: "Grüne", data: [], borderColor: '#409A3C', backgroundColor: '#409A3C', tension: tension, datalabels: { color: '#409A3C' } },
+                    { label: "FDP", data: [], borderColor: '#FFED00', backgroundColor: '#FFED00', tension: tension, datalabels: { color: '#FFED00' } },
+                    { label: "Linke", data: [], borderColor: '#BE3075', backgroundColor: '#BE3075', tension: tension, datalabels: { color: '#BE3075' } },
+                    { label: "AfD", data: [], borderColor: '#009EE0', backgroundColor: '#009EE0', tension: tension, datalabels: { color: '#009EE0' } },
+                    { label: "FW", data: [], borderColor: '#F7A800', backgroundColor: '#F7A800', tension: tension, datalabels: { color: '#F7A800' } },
+                    { label: "BSW", data: [], borderColor: '#7D254F', backgroundColor: '#7D254F', tension: tension, datalabels: { color: '#7D254F' }},
+                    { label: "Sonstige", data: [], borderColor: 'rgba(0, 0, 0, 0.1)', backgroundColor: 'rgba(0, 0, 0, 0.1)', tension: tension, datalabels: { color: 'rgba(0, 0, 0, 0.3)' } }      
                 ]
             }
 
@@ -148,6 +154,23 @@
             canvas.id = 'chart'
             document.getElementById('chart-wrapper').appendChild(canvas)
 
+            const plugins = [
+                {
+                    id: 'customCanvasBackgroundColor',
+                    beforeDraw: (chart, args, options) => {
+                        const {ctx} = chart;
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'destination-over';
+                        ctx.fillStyle = options.color || '#99ffff';
+                        ctx.fillRect(0, 0, chart.width, chart.height);
+                        ctx.restore();
+                    }
+                }
+            ]
+            if (inputLabels.checked) {
+                plugins.push(ChartDataLabels)
+            }
+
             new Chart(document.getElementById('chart'), {
                 type: 'line',
                 data: prepareData(),
@@ -159,20 +182,13 @@
                         },
                         customCanvasBackgroundColor: {
                             color: '#fff'
+                        },
+                        datalabels: {
+                            align: 'top'
                         }
                     }
                 },
-                plugins: [{
-                    id: 'customCanvasBackgroundColor',
-                    beforeDraw: (chart, args, options) => {
-                        const {ctx} = chart;
-                        ctx.save();
-                        ctx.globalCompositeOperation = 'destination-over';
-                        ctx.fillStyle = options.color || '#99ffff';
-                        ctx.fillRect(0, 0, chart.width, chart.height);
-                        ctx.restore();
-                    }
-                }]
+                plugins: plugins
             })
         }
 
