@@ -29244,5 +29244,20 @@
         "bsw": 7,
         "sonstige": 4.5,
         "nichtwUnentschl": 0
+    },
+    {
+        "institut": "INSA",
+        "befragte": 1203,
+        "vDatum": "2024-04-27T07:00:00.000Z",
+        "cducsu": 29,
+        "spd": 16,
+        "grne": 13,
+        "fdp": 5,
+        "linke": 4,
+        "afd": 18,
+        "fw": 2,
+        "bsw": 7,
+        "sonstige": 6,
+        "nichtwUnentschl": 0
     }
 ]
