@@ -1,11 +1,13 @@
 <!doctype html>
+<html lang="de">
 <head>
     <title>Verlauf Projektionen Sonntagsfrage Bundestagswahl (alle Institute)</title>
+    <meta charset="utf-8">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; overflow: scroll; }
+        body, html { margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
         .menu { position: relative; width: 100%; display: flex; }
-        .menu > div { padding: 15px; }
+        .menu > div, .footer-note { padding: 15px; }
         #chart { position: relative; width: 100%; height: 100vh; }
         label { font-weight: bold; }
     </style>
@@ -40,11 +42,12 @@
         </div>
         <div>
             <a id="download" download="chart.jpg" href="#" title="Aktuelles Chart speichern">
-                Grafik speichern
+                Chart als Grafik speichern
             </a>
         </div>
     </div>
-    <canvas id="chart"></canvas>
+    <div id="chart-wrapper"><canvas id="chart"></canvas></div>
+    <div class="footer-note">(c) Stephan Schmitz, Datenquelle: <a href="https://www.wahlrecht.de/umfragen/" target="_blank" ref="nofollow">wahlrecht.de</a></div>
     <script>
         const inputEnddate = document.getElementById('end')
         const inputStartdate = document.getElementById('start')
@@ -54,28 +57,13 @@
         let jsonData
 
         function updateURL() {
-            const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
-
-            if (inputStartdate.value === '' && params.has('start')) {
-                params.delete('start')
-            } 
-            if (inputStartdate.value !== '') {
-                params.set('start', inputStartdate.value)
-            }
-
-            if (inputEnddate.value === '' && params.has('end')) {
-                params.delete('end')
-            } 
-            if (inputEnddate.value !== '') {
-                params.set('end', inputEnddate.value)
-            }
-
-            if (institut === 'alle' && params.has('institut')) {
-                params.delete('institut')
-            }
-            if (institut !== 'alle') {
-                params.set('institut', institut)
-            }
+            const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value;
+            (inputStartdate.value === '' && params.has('start')) && params.delete('start');
+            inputStartdate.value !== '' && params.set('start', inputStartdate.value);
+            (inputEnddate.value === '' && params.has('end')) && params.delete('end');
+            inputEnddate.value !== '' && params.set('end', inputEnddate.value);
+            (institut === 'alle' && params.has('institut')) && params.delete('institut');
+            institut !== 'alle' && params.set('institut', institut);
 
             history.replaceState(null, null, '?' + params.toString())
         }
@@ -104,32 +92,20 @@
 
             for (let i = 0; i < jsonData.length; i++) {
                 // 1. if date is already set, skip
-                let conditionsPass = !data.labels.includes(jsonData[i].vDatum)
-                if (!conditionsPass) {
+                if (data.labels.includes(jsonData[i].vDatum)) {
                     continue
                 }
-
                 // 2. if daterange filter is set, skip if not in daterange
                 const date = new Date(jsonData[i].vDatum)
-                if (inputStartdate.value !== '') {
-                    conditionsPass = new Date(inputStartdate.value) < date
-                }
-                if (!conditionsPass) {
+                if (inputStartdate.value !== '' && new Date(inputStartdate.value) > date) {
                     continue
                 }
-                if (inputEnddate.value !== '') {
-                    conditionsPass = date < new Date(inputEnddate.value)
-                }
-                if (!conditionsPass) {
+                if (inputEnddate.value !== '' && date > new Date(inputEnddate.value)) {
                     continue
                 }
-
                 // 3. if institut filter is set, skip if institut is not selected
                 const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
-                if (institut !== 'alle') {
-                    conditionsPass = institut === jsonData[i].institut
-                }
-                if (!conditionsPass) {
+                if (institut !== 'alle' && institut !== jsonData[i].institut) {
                     continue
                 }
 
@@ -170,19 +146,7 @@
             document.getElementById('chart').remove()
             let canvas = document.createElement('canvas')
             canvas.id = 'chart'
-            document.body.appendChild(canvas)
-
-            const bgPlugin = {
-                id: 'customCanvasBackgroundColor',
-                beforeDraw: (chart, args, options) => {
-                    const {ctx} = chart;
-                    ctx.save();
-                    ctx.globalCompositeOperation = 'destination-over';
-                    ctx.fillStyle = options.color || '#99ffff';
-                    ctx.fillRect(0, 0, chart.width, chart.height);
-                    ctx.restore();
-                }
-            }
+            document.getElementById('chart-wrapper').appendChild(canvas)
 
             new Chart(document.getElementById('chart'), {
                 type: 'line',
@@ -198,11 +162,21 @@
                         }
                     }
                 },
-                plugins: [bgPlugin]
+                plugins: [{
+                    id: 'customCanvasBackgroundColor',
+                    beforeDraw: (chart, args, options) => {
+                        const {ctx} = chart;
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'destination-over';
+                        ctx.fillStyle = options.color || '#99ffff';
+                        ctx.fillRect(0, 0, chart.width, chart.height);
+                        ctx.restore();
+                    }
+                }]
             })
         }
 
-        (async () => {
+        (() => {
             params.has('end') && (inputEnddate.value = params.get('end'))
             params.has('start') && (inputStartdate.value = params.get('start'))
             params.has('institut') && (inputInstitut.value = params.get('institut'))
@@ -214,9 +188,12 @@
                 renderChart()
             })
 
-            document.getElementById('download').addEventListener('click', function() {
-                document.getElementById('download').href = document.getElementById('chart').toDataURL('image/jpg')
+            const dlLink = document.getElementById('download')
+            dlLink.addEventListener('click', () => {
+                dlLink.download = `chart-projektionen-btw-${Date.now()}.jpg`
+                dlLink.href = document.getElementById('chart').toDataURL('image/jpg')
             })
         })()
     </script>
 </body>
+</html>
