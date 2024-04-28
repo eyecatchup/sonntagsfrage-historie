@@ -97,12 +97,13 @@
             }
 
             for (let i = 0; i < jsonData.length; i++) {
+                const date = new Date(jsonData[i].vDatum)
+                const localeDateString = date.toLocaleDateString()
                 // 1. if date is already set, skip
-                if (data.labels.includes(jsonData[i].vDatum)) {
+                if (data.labels.includes(localeDateString)) {
                     continue
                 }
                 // 2. if daterange filter is set, skip if not in daterange
-                const date = new Date(jsonData[i].vDatum)
                 if (inputStartdate.value !== '' && new Date(inputStartdate.value) > date) {
                     continue
                 }
@@ -115,7 +116,7 @@
                     continue
                 }
 
-                data.labels.push(jsonData[i].vDatum.split('T')[0])
+                data.labels.push(localeDateString)
                 data.datasets[0].data.push(jsonData[i].cducsu)
                 data.datasets[1].data.push(jsonData[i].spd)
                 data.datasets[2].data.push(jsonData[i].grne)
