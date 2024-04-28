@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
     <title>Verlauf Projektionen Sonntagsfrage Bundestagswahl (alle Institute)</title>
+    <meta name="description" content="Interaktive Verlaufsdiagramme (seit 2013) von Projektionen zur Sonntagsfrage Bundestagswahl aller Umfrageinstitute">
     <meta charset="utf-8">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0 "></script>
@@ -52,7 +53,7 @@
         </div>
     </div>
     <div id="chart-wrapper"><canvas id="chart"></canvas></div>
-    <div class="footer-note">(c) Stephan Schmitz, Datenquelle: <a href="https://www.wahlrecht.de/umfragen/" target="_blank" ref="nofollow">wahlrecht.de</a></div>
+    <div class="footer-note">(c) <a href="https://github.com/eyecatchup/sonntagsfrage-historie/" target="_blank" rel="nofollow">Open Source</a> by Stephan Schmitz, Datenquelle: <a href="https://www.wahlrecht.de/umfragen/" target="_blank" ref="nofollow">wahlrecht.de</a></div>
     <script>
         const inputEnddate = document.getElementById('end')
         const inputStartdate = document.getElementById('start')
@@ -84,35 +85,32 @@
             const data = {
                 labels: [],
                 datasets: [
-                    { label: "CDU/CSU", data: [], borderColor: 'black', backgroundColor: 'black', tension: tension, datalabels: { color: '#000' } },
-                    { label: "SPD", data: [], borderColor: '#E30613', backgroundColor: '#E30613', tension: tension, datalabels: { color: '#E30613' } },
-                    { label: "Grüne", data: [], borderColor: '#409A3C', backgroundColor: '#409A3C', tension: tension, datalabels: { color: '#409A3C' } },
-                    { label: "FDP", data: [], borderColor: '#FFED00', backgroundColor: '#FFED00', tension: tension, datalabels: { color: '#FFED00' } },
-                    { label: "Linke", data: [], borderColor: '#BE3075', backgroundColor: '#BE3075', tension: tension, datalabels: { color: '#BE3075' } },
-                    { label: "AfD", data: [], borderColor: '#009EE0', backgroundColor: '#009EE0', tension: tension, datalabels: { color: '#009EE0' } },
-                    { label: "FW", data: [], borderColor: '#F7A800', backgroundColor: '#F7A800', tension: tension, datalabels: { color: '#F7A800' } },
-                    { label: "BSW", data: [], borderColor: '#7D254F', backgroundColor: '#7D254F', tension: tension, datalabels: { color: '#7D254F' }},
-                    { label: "Sonstige", data: [], borderColor: 'rgba(0, 0, 0, 0.1)', backgroundColor: 'rgba(0, 0, 0, 0.1)', tension: tension, datalabels: { color: 'rgba(0, 0, 0, 0.3)' } }      
+                    { label: 'CDU/CSU', data: [], borderColor: 'black', backgroundColor: 'black', tension: tension, datalabels: { color: '#000' } },
+                    { label: 'SPD', data: [], borderColor: '#E30613', backgroundColor: '#E30613', tension: tension, datalabels: { color: '#E30613' } },
+                    { label: 'Grüne', data: [], borderColor: '#409A3C', backgroundColor: '#409A3C', tension: tension, datalabels: { color: '#409A3C' } },
+                    { label: 'FDP', data: [], borderColor: '#FFED00', backgroundColor: '#FFED00', tension: tension, datalabels: { color: '#FFED00' } },
+                    { label: 'Linke', data: [], borderColor: '#BE3075', backgroundColor: '#BE3075', tension: tension, datalabels: { color: '#BE3075' } },
+                    { label: 'AfD', data: [], borderColor: '#009EE0', backgroundColor: '#009EE0', tension: tension, datalabels: { color: '#009EE0' } },
+                    { label: 'FW', data: [], borderColor: '#F7A800', backgroundColor: '#F7A800', tension: tension, datalabels: { color: '#F7A800' } },
+                    { label: 'BSW', data: [], borderColor: '#7D254F', backgroundColor: '#7D254F', tension: tension, datalabels: { color: '#7D254F' }},
+                    { label: 'Sonstige', data: [], borderColor: 'rgba(0, 0, 0, 0.1)', backgroundColor: 'rgba(0, 0, 0, 0.1)', tension: tension, datalabels: { color: 'rgba(0, 0, 0, 0.3)' } }      
                 ]
             }
 
+            const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
             for (let i = 0; i < jsonData.length; i++) {
                 const date = new Date(jsonData[i].vDatum)
                 const localeDateString = date.toLocaleDateString()
-                // 1. if date is already set, skip
-                if (data.labels.includes(localeDateString)) {
-                    continue
-                }
-                // 2. if daterange filter is set, skip if not in daterange
-                if (inputStartdate.value !== '' && new Date(inputStartdate.value) > date) {
-                    continue
-                }
-                if (inputEnddate.value !== '' && date > new Date(inputEnddate.value)) {
-                    continue
-                }
-                // 3. if institut filter is set, skip if institut is not selected
-                const institut = inputInstitut.options[inputInstitut.options.selectedIndex].value
-                if (institut !== 'alle' && institut !== jsonData[i].institut) {
+
+                // if date is already set, skip
+                // or, if daterange filter is set, skip if not in daterange
+                // or, if institut filter is set, skip if institut is not selected
+                if (
+                    data.labels.includes(localeDateString) ||
+                    (inputStartdate.value !== '' && new Date(inputStartdate.value) > date) ||
+                    (inputEnddate.value !== '' && date > new Date(inputEnddate.value)) ||
+                    (institut !== 'alle' && institut !== jsonData[i].institut)
+                ) {
                     continue
                 }
 
@@ -159,12 +157,12 @@
                 {
                     id: 'customCanvasBackgroundColor',
                     beforeDraw: (chart, args, options) => {
-                        const {ctx} = chart;
-                        ctx.save();
-                        ctx.globalCompositeOperation = 'destination-over';
-                        ctx.fillStyle = options.color || '#99ffff';
-                        ctx.fillRect(0, 0, chart.width, chart.height);
-                        ctx.restore();
+                        const {ctx} = chart
+                        ctx.save()
+                        ctx.globalCompositeOperation = 'destination-over'
+                        ctx.fillStyle = options.color || '#99ffff'
+                        ctx.fillRect(0, 0, chart.width, chart.height)
+                        ctx.restore()
                     }
                 }
             ]
@@ -177,16 +175,9 @@
                 data: prepareData(),
                 options: {
                     plugins: {
-                        title: {
-                            display: true,
-                            text: chartTitle
-                        },
-                        customCanvasBackgroundColor: {
-                            color: '#fff'
-                        },
-                        datalabels: {
-                            align: 'top'
-                        }
+                        datalabels: { align: 'top' },
+                        title: { display: true, text: chartTitle },
+                        customCanvasBackgroundColor: { color: '#fff' }
                     }
                 },
                 plugins: plugins
