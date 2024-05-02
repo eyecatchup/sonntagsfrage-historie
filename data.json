@@ -29274,5 +29274,20 @@
         "bsw": 7,
         "sonstige": 5,
         "nichtwUnentschl": 0
+    },
+    {
+        "institut": "Forsa",
+        "befragte": 2505,
+        "vDatum": "2024-04-30T07:00:00.000Z",
+        "cducsu": 30,
+        "spd": 17,
+        "grne": 12,
+        "fdp": 5,
+        "linke": 3,
+        "afd": 16,
+        "fw": 0,
+        "bsw": 4,
+        "sonstige": 13,
+        "nichtwUnentschl": 0
     }
 ]
