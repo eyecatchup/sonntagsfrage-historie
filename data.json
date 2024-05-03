@@ -29289,5 +29289,20 @@
         "bsw": 4,
         "sonstige": 13,
         "nichtwUnentschl": 0
+    },
+    {
+        "institut": "dimap",
+        "befragte": 1304,
+        "vDatum": "2024-05-02T07:00:00.000Z",
+        "cducsu": 31,
+        "spd": 15,
+        "grne": 15,
+        "fdp": 5,
+        "linke": 0,
+        "afd": 18,
+        "fw": 0,
+        "bsw": 5,
+        "sonstige": 11,
+        "nichtwUnentschl": 0
     }
 ]
