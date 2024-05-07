@@ -29304,5 +29304,50 @@
         "bsw": 5,
         "sonstige": 11,
         "nichtwUnentschl": 0
+    },
+    {
+        "institut": "INSA",
+        "befragte": 1203,
+        "vDatum": "2024-05-04T07:00:00.000Z",
+        "cducsu": 30,
+        "spd": 15,
+        "grne": 12,
+        "fdp": 5,
+        "linke": 4,
+        "afd": 18,
+        "fw": 2,
+        "bsw": 7,
+        "sonstige": 7,
+        "nichtwUnentschl": 0
+    },
+    {
+        "institut": "INSA",
+        "befragte": 2006,
+        "vDatum": "2024-05-06T07:00:00.000Z",
+        "cducsu": 30.5,
+        "spd": 15.5,
+        "grne": 12,
+        "fdp": 5,
+        "linke": 3.5,
+        "afd": 18,
+        "fw": 2.5,
+        "bsw": 7.5,
+        "sonstige": 5.5,
+        "nichtwUnentschl": 0
+    },
+    {
+        "institut": "GMS",
+        "befragte": 1005,
+        "vDatum": "2024-05-07T07:00:00.000Z",
+        "cducsu": 31,
+        "spd": 15,
+        "grne": 14,
+        "fdp": 4,
+        "linke": 2,
+        "afd": 18,
+        "fw": 3,
+        "bsw": 6,
+        "sonstige": 7,
+        "nichtwUnentschl": 0
     }
 ]
