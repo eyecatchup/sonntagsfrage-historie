@@ -29336,6 +29336,21 @@
         "nichtwUnentschl": 0
     },
     {
+        "institut": "Forsa",
+        "befragte": 2000,
+        "vDatum": "2024-05-07T07:00:00.000Z",
+        "cducsu": 31,
+        "spd": 16,
+        "grne": 12,
+        "fdp": 6,
+        "linke": 3,
+        "afd": 15,
+        "fw": 0,
+        "bsw": 4,
+        "sonstige": 13,
+        "nichtwUnentschl": 0
+    },
+    {
         "institut": "GMS",
         "befragte": 1005,
         "vDatum": "2024-05-07T07:00:00.000Z",
