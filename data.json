@@ -1,5 +1,6 @@
 [
     {
+    {
         "institut": "Forsa",
         "befragte": "Bundestagswahl",
         "vDatum": "2013-09-22T07:00:00.000Z",
@@ -14,7 +15,6 @@
         "sonstige": 3.1,
         "nichtwUnentschl": 29.2
     },
-    {
         "institut": "Emnid",
         "befragte": 1382,
         "vDatum": "2013-09-29T07:00:00.000Z",
@@ -29453,6 +29453,36 @@
         "fw": 3,
         "bsw": 5,
         "sonstige": 7,
+        "nichtwUnentschl": 0
+    },
+    {
+        "institut": "Forsa",
+        "befragte": 2001,
+        "vDatum": "2024-05-21T07:00:00.000Z",
+        "cducsu": 32,
+        "spd": 16,
+        "grne": 14,
+        "fdp": 5,
+        "linke": 0,
+        "afd": 15,
+        "fw": 0,
+        "bsw": 5,
+        "sonstige": 13,
+        "nichtwUnentschl": 0
+    },
+    {
+        "institut": "INSA",
+        "befragte": 2010,
+        "vDatum": "2024-05-21T07:00:00.000Z",
+        "cducsu": 30,
+        "spd": 16,
+        "grne": 12.5,
+        "fdp": 5,
+        "linke": 3,
+        "afd": 17,
+        "fw": 3,
+        "bsw": 7,
+        "sonstige": 6.5,
         "nichtwUnentschl": 0
     }
 ]
