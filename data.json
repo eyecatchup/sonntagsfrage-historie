@@ -1,6 +1,5 @@
 [
     {
-    {
         "institut": "Forsa",
         "befragte": "Bundestagswahl",
         "vDatum": "2013-09-22T07:00:00.000Z",
@@ -15,6 +14,7 @@
         "sonstige": 3.1,
         "nichtwUnentschl": 29.2
     },
+    {
         "institut": "Emnid",
         "befragte": 1382,
         "vDatum": "2013-09-29T07:00:00.000Z",
